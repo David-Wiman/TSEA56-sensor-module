@@ -19,6 +19,10 @@ volatile int left_speed;
 volatile int right_speed;
 volatile int IR_output = 0;
 volatile int IR_distance = 0;
+int IR_distance_mean = 0;
+int IR_buffer_size = 10;
+int IR_buffer[IR_buffer_size];
+int IR_buffer_index = 0;
 
 
 
@@ -38,13 +42,23 @@ void init_ir_timer() {
 }
 
 void init_interrupts_INT0_1() {
-	EICRA = (1<<ISC00) | (1<<ISC01) | (1<<ISC10) | (1<<ISC11); // Set interrupts on rising edge.
+	EICRA = (1<<ISC00) | (1<<ISC01) | (1<<ISC10) | (1<<ISC11); // Set interrupts on rising edge
 	EIMSK = (1<<INT1) | (1<<INT0);	//Enable interrupts on INT0 and INT1
 }
 
 void init_ADC() {
 	ADMUX = (1<<REFS1) | (1<<REFS0);  // Set referense-voltage to internal 2.56V.
 	ADCSRA = (1<<ADEN) | (1<<ADIE);	//Enable ADC and ADC Interrupt
+}
+
+// This function should only be used in the same block as IR_buffer is already accessed, to prevent multiple accesses at the same time
+// Note that this function updates IR_distance_mean directly rather than returning it
+void calc_IR_mean() {
+	int sum = 0;
+	for (i=0; i<IR_buffer_size, i++) {
+		sum += IR_buffer[i];
+	}
+	IR_distance_mean = sum/IR_buffer_size;
 }
 
 ISR (TIMER1_COMPA_vect) {
@@ -59,13 +73,19 @@ ISR (TIMER0_OVF_vect) {
 	
 ISR (ADC_vect)  {
 	cli();
-	IR_output = ADCL; // Read bit 1-8.
-	IR_output |= (ADCH<<8); // Read bit 9-10
+	IR_output = ADCL;  // Read bit 1-8.
+	IR_output |= (ADCH<<8);  // Read bit 9-10
 	if (IR_output < 700) {
-		IR_distance = 400*63/IR_output; // (1024 steps)/(2.56 V) = 400 steps/V, taking inverse to get distance
+		IR_distance = 400*63/IR_output;  // (1024 steps)/(2.56 V) = 400 steps/V, taking inverse to get distance
 	} else {
-		IR_distance = -20*IR_output/400 + 71;
+		IR_distance = -20*IR_output/400 + 71;  // See documentation for details about this calculation
 	}
+	IR_buffer[IR_buffer_index] = IR_distance;  // Put in buffer and rotate index of buffer
+	IR_buffer_index++;
+	if (IR_buffer_index >= IR_buffer_size) {
+		IR_buffer_index = 0;
+	}
+	calc_IR_mean();
 	sei();
 }
 	
