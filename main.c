@@ -1,5 +1,5 @@
 /*
- * Hallsensor.c
+ * main.c
  *
  * Created: 2022-04-04 10:04:44
  * Author : alvgu648
@@ -13,10 +13,15 @@ volatile long int left_hall_time = 0;
 volatile long int right_hall_time = 0;
 volatile long int pre_left_time_var = 0;
 volatile long int pre_right_time_var = 0;
-volatile int count_r = 0;
-volatile int count_l = 0;
-volatile int left_speed;
-volatile int right_speed;
+
+//volatile int count_r = 0;  // actually not really used
+//volatile int count_l = 0;  // actually not really used
+volatile long int driven_distance_right = 0;  // In mm
+volatile long int driven_distance_left = 0;  // In mm
+
+volatile int left_speed;  // In mm/s
+volatile int right_speed;  //In mm/s
+
 volatile int IR_output = 0;
 volatile int IR_distance = 0;
 int IR_distance_mean = 0;
@@ -92,20 +97,24 @@ ISR (ADC_vect)  {
 // Left hall sensor
 ISR (INT0_vect) {
 	cli();
-	count_l += 1;
+	// count_l += 1;
 	left_hall_time = time_var - pre_left_time_var;
 	pre_left_time_var = time_var;
 	left_speed = 98175/left_hall_time; // 1000*0.0080*pi*1000/0.256 = 98175
+
+	driven_distance_left += 25;
 	sei();
 }
 
 // Right hall sensor
 ISR (INT1_vect) {
 	cli();
-	count_r +=1;
+	// count_r +=1;
 	right_hall_time = time_var - pre_right_time_var;
 	pre_right_time_var = time_var;
 	right_speed = 98175/right_hall_time; // 1000*0.0080*pi*1000/0.256 = 98175
+
+	driven_distance_right += 25;
 	sei();
 }
 
