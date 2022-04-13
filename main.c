@@ -24,7 +24,7 @@ volatile int right_speed;  //In mm/s
 
 volatile int IR_output = 0;
 volatile int IR_distance = 0;
-int IR_distance_mean = 0;
+volatile int IR_distance_mean = 0;
 int IR_buffer_size = 10;
 int IR_buffer[IR_buffer_size];
 int IR_buffer_index = 0;
