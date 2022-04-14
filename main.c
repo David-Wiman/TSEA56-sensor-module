@@ -26,7 +26,7 @@ volatile int IR_output = 0;
 volatile int IR_distance = 0;
 volatile int IR_distance_mean = 0;
 int IR_buffer_size = 10;
-int IR_buffer[IR_buffer_size];
+int IR_buffer[10];
 int IR_buffer_index = 0;
 
 
@@ -60,7 +60,7 @@ void init_ADC() {
 // Note that this function updates IR_distance_mean directly rather than returning it
 void calc_IR_mean() {
 	int sum = 0;
-	for (i=0; i<IR_buffer_size, i++) {
+	for (int i=0; i<IR_buffer_size; i++) {
 		sum += IR_buffer[i];
 	}
 	IR_distance_mean = sum/IR_buffer_size;
