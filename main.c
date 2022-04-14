@@ -8,16 +8,19 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-volatile long int time_var = 0;
-volatile long int left_hall_time = 0;
-volatile long int right_hall_time = 0;
-volatile long int pre_left_time_var = 0;
-volatile long int pre_right_time_var = 0;
+#include "communication-module/common/avr_i2c.h"
+#include "communication-module/common/i2c_common.h"
+
+volatile uint16_t time_var = 0;
+volatile uint16_t left_hall_time = 0;
+volatile uint16_t right_hall_time = 0;
+volatile uint16_t pre_left_time_var = 0;
+volatile uint16_t pre_right_time_var = 0;
 
 //volatile int count_r = 0;  // actually not really used
 //volatile int count_l = 0;  // actually not really used
-volatile long int driven_distance_right = 0;  // In mm
-volatile long int driven_distance_left = 0;  // In mm
+volatile uint16_t driven_distance_right = 0;  // In mm
+volatile uint16_t driven_distance_left = 0;  // In mm
 
 volatile int left_speed;  // In mm/s
 volatile int right_speed;  //In mm/s
@@ -91,6 +94,7 @@ ISR (ADC_vect)  {
 		IR_buffer_index = 0;
 	}
 	calc_IR_mean();
+	I2C_pack_one(SENSOR_OBSTACLE_DISTANCE, IR_distance_mean);
 	sei();
 }
 	
@@ -103,6 +107,9 @@ ISR (INT0_vect) {
 	left_speed = 98175/left_hall_time; // 1000*0.0080*pi*1000/0.256 = 98175
 
 	driven_distance_left += 25;
+	uint16_t message_names[] = {SENSOR_LEFT_SPEED, SENSOR_LEFT_DRIVING_DISTANCE};
+	uint16_t messages[] = {left_speed, driven_distance_left};
+	I2C_pack(message_names, messages, 2);
 	sei();
 }
 
@@ -115,17 +122,21 @@ ISR (INT1_vect) {
 	right_speed = 98175/right_hall_time; // 1000*0.0080*pi*1000/0.256 = 98175
 
 	driven_distance_right += 25;
+	uint16_t message_names[] = {SENSOR_RIGHT_SPEED, SENSOR_RIGHT_DRIVING_DISTANCE};
+	uint16_t messages[] = {right_speed, driven_distance_right};
+	I2C_pack(message_names, messages, 2);
+
 	sei();
 }
 
 
 
-int main(void)
-{
+int main(void) {
 	init_hall_timer();
 	init_interrupts_INT0_1();
 	init_ADC();
 	init_ir_timer();
+	I2C_init(SENSOR_MODULE_SLAVE_ADDRESS);
 	sei();
     /* Replace with your application code */
     while (1) 
