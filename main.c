@@ -3,6 +3,7 @@
  *
  * Created: 2022-04-04 10:04:44
  * Author : alvgu648
+ * Use second JTAG device in Daisy chain list.
  */ 
 
 #include <avr/io.h>
@@ -195,11 +196,7 @@ int main() {
 	I2C_init(SENSOR_MODULE_SLAVE_ADDRESS);
 	sei();
     /* Replace with your application code */
-    while (1) 
-    {
-
-
-	}
+    while (1) {}
 	return 1;
 }
 
