@@ -77,7 +77,7 @@ void init_ADC() {
 // Note that this function updates IR_distance_mean directly rather than returning it
 
 uint16_t calc_buffer_mean(int *buffer, int buffer_size) {
-	int sum = 0;
+	uint16_t sum = 0;
 	for (int i=0; i<buffer_size; i++) {
 		sum += buffer[i];
 	}
@@ -132,6 +132,11 @@ ISR (INT0_vect) {
 	times_without_hall = 0;
 	left_hall_time = time_var - pre_left_time_var;
 	pre_left_time_var = time_var;
+	
+	if (left_hall_time == 0) {
+		return;
+	}
+
 	left_speed = 98175/left_hall_time; // 1000*0.0080*pi*1000/0.256 = 98175
 
 	 // Averaging code for left_speed
@@ -161,8 +166,12 @@ ISR (INT1_vect) {
 	times_without_hall = 0;
 	right_hall_time = time_var - pre_right_time_var;
 	pre_right_time_var = time_var;
-	right_speed = 98175/right_hall_time; // 1000*0.0080*pi*1000/0.256 = 98175
 	
+	if (right_hall_time == 0) {
+		return;
+	}
+	right_speed = 98175/right_hall_time; // 1000*0.0080*pi*1000/0.256 = 98175
+
 	 // Averaging code for right_speed
 	right_speed_buffer[right_speed_buffer_index] = right_speed;  // Put in buffer and rotate index of buffer
 	right_speed_buffer_index++;
@@ -170,7 +179,6 @@ ISR (INT1_vect) {
 		right_speed_buffer_index = 0;
 	}
 	uint16_t right_speed_mean = calc_buffer_mean(right_speed_buffer, speed_buffer_size);
-
 
 	 // Count up driven distance right
 	right_hall_prescaler++;
