@@ -32,10 +32,10 @@ volatile uint16_t driven_distance_left = 0;  // In dm
 
 volatile uint16_t left_speed;  // In mm/s
 volatile uint16_t right_speed;  //In mm/s
-int speed_buffer_size = 10;
-int left_speed_buffer[10];
+int speed_buffer_size = 3;
+int left_speed_buffer[3];
 int left_speed_buffer_index = 0;
-int right_speed_buffer[10];
+int right_speed_buffer[3];
 int right_speed_buffer_index = 0;
 
 
