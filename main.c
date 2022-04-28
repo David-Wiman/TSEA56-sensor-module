@@ -10,8 +10,8 @@
 #include <avr/interrupt.h>
 #include <avr/delay.h>
 
-#include "communication-module/common/avr_i2c.h"
-#include "communication-module/common/i2c_common.h"
+#include "i2c/avr_i2c.h"
+#include "common/i2c_common.h"
 
 volatile uint16_t time_var = 0;
 volatile uint16_t left_hall_time = 0;
