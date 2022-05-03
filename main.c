@@ -121,7 +121,7 @@ ISR (ADC_vect)  {
 		}	
 		IR_distance_mean = calc_buffer_mean(IR_buffer, IR_BUFFER_SIZE);
 	} else {
-		IR_distance_mean = 0;
+		IR_distance_mean = 1000;
 	}
 	
 	I2C_pack_one(SENSOR_OBSTACLE_DISTANCE, IR_distance_mean);
