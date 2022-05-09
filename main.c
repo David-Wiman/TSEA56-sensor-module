@@ -109,9 +109,9 @@ ISR (ADC_vect)  {
 	IR_output = ADCL;  // Read bit 1-8.
 	IR_output |= (ADCH<<8);  // Read bit 9-10
 	if (IR_output < 700) {
-		IR_distance = 400*63/IR_output;  // (1024 steps)/(2.56 V) = 400 steps/V, taking inverse to get distance
+		IR_distance = 200*63/IR_output;  // (1024 steps)/(2.56 V) = 400 steps/V, taking inverse to get distance. 200 = 400/2
 	}  else {
-		IR_distance = 71 - 20*IR_output/400 ;  // See documentation for details about this calculation
+		IR_distance = 36 - 10*IR_output/400 ;  // See documentation for details about this calculation. 36 = 71/2, 10 = 20/2
 	}
 	if (IR_distance < 150) {
 		IR_buffer[IR_buffer_index] = IR_distance;  // Put in buffer and rotate index of buffer
