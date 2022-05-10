@@ -32,11 +32,11 @@ volatile uint16_t driven_distance_left = 0;  // In dm
 
 volatile uint16_t left_speed;  // In mm/s
 volatile uint16_t right_speed;  //In mm/s
-#define SPEED_BUFFER_SIZE 3
-volatile int left_speed_buffer[SPEED_BUFFER_SIZE];
-volatile int left_speed_buffer_index = 0;
-volatile int right_speed_buffer[SPEED_BUFFER_SIZE];
-volatile int right_speed_buffer_index = 0;
+//#define SPEED_BUFFER_SIZE 3
+//volatile int left_speed_buffer[SPEED_BUFFER_SIZE];
+//volatile int left_speed_buffer_index = 0;
+//volatile int right_speed_buffer[SPEED_BUFFER_SIZE];
+//volatile int right_speed_buffer_index = 0;
 
 
 
@@ -140,12 +140,12 @@ ISR (INT0_vect) {
 	left_speed = 98175/left_hall_time; // 1000*0.0080*pi*1000/0.256 = 98175
 
 	 // Averaging code for left_speed
-	left_speed_buffer[left_speed_buffer_index] = left_speed;  // Put in buffer and rotate index of buffer
-	left_speed_buffer_index++;
-	if (left_speed_buffer_index >= SPEED_BUFFER_SIZE) {
-		left_speed_buffer_index = 0;
-	}
-	uint16_t left_speed_mean = calc_buffer_mean(left_speed_buffer, SPEED_BUFFER_SIZE);
+	//left_speed_buffer[left_speed_buffer_index] = left_speed;  // Put in buffer and rotate index of buffer
+	//left_speed_buffer_index++;
+	//if (left_speed_buffer_index >= SPEED_BUFFER_SIZE) {
+	//	left_speed_buffer_index = 0;
+	//}
+	//uint16_t left_speed_mean = calc_buffer_mean(left_speed_buffer, SPEED_BUFFER_SIZE);
 
 	 // Count up driven distance left
 	left_hall_prescaler++;
@@ -153,7 +153,8 @@ ISR (INT0_vect) {
 		driven_distance_left++;
 		
 		uint16_t message_names[] = {SENSOR_LEFT_SPEED, SENSOR_LEFT_DRIVING_DISTANCE};
-		uint16_t messages[] = {left_speed_mean, driven_distance_left};
+		//uint16_t messages[] = {left_speed_mean, driven_distance_left};
+		uint16_t messages[] = {left_speed, driven_distance_left};
 		I2C_pack(message_names, messages, 2);
 		left_hall_prescaler = 0;
 
@@ -173,12 +174,12 @@ ISR (INT1_vect) {
 	right_speed = 98175/right_hall_time; // 1000*0.0080*pi*1000/0.256 = 98175
 
 	 // Averaging code for right_speed
-	right_speed_buffer[right_speed_buffer_index] = right_speed;  // Put in buffer and rotate index of buffer
-	right_speed_buffer_index++;
-	if (right_speed_buffer_index >= SPEED_BUFFER_SIZE) {
-		right_speed_buffer_index = 0;
-	}
-	uint16_t right_speed_mean = calc_buffer_mean(right_speed_buffer, SPEED_BUFFER_SIZE);
+	//right_speed_buffer[right_speed_buffer_index] = right_speed;  // Put in buffer and rotate index of buffer
+	//right_speed_buffer_index++;
+	//if (right_speed_buffer_index >= SPEED_BUFFER_SIZE) {
+	//	right_speed_buffer_index = 0;
+	//}
+	//uint16_t right_speed_mean = calc_buffer_mean(right_speed_buffer, SPEED_BUFFER_SIZE);
 
 	 // Count up driven distance right
 	right_hall_prescaler++;
@@ -186,7 +187,8 @@ ISR (INT1_vect) {
 		driven_distance_right++;
 		
 		uint16_t message_names[] = {SENSOR_RIGHT_SPEED, SENSOR_RIGHT_DRIVING_DISTANCE};
-		uint16_t messages[] = {right_speed_mean, driven_distance_right};
+		//uint16_t messages[] = {right_speed_mean, driven_distance_right};
+		uint16_t messages[] = {right_speed, driven_distance_right};
 		I2C_pack(message_names, messages, 2);
 		right_hall_prescaler = 0;
 
