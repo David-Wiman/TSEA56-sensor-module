@@ -109,9 +109,9 @@ ISR (ADC_vect)  {
 	IR_output = ADCL;  // Read bit 1-8.
 	IR_output |= (ADCH<<8);  // Read bit 9-10
 	if (IR_output < 700) {
-		IR_distance = 400*63/IR_output;  // (1024 steps)/(2.56 V) = 400 steps/V, taking inverse to get distance
+		IR_distance = 400*63/IR_output;  // (1024 steps)/(2.56 V) = 400 steps/V, taking inverse to get distance.
 	}  else {
-		IR_distance = 71 - 20*IR_output/400 ;  // See documentation for details about this calculation
+		IR_distance = 71 - 20*IR_output/400 ;  // See documentation for details about this calculation.
 	}
 	if (IR_distance < 150) {
 		IR_buffer[IR_buffer_index] = IR_distance;  // Put in buffer and rotate index of buffer
@@ -121,7 +121,7 @@ ISR (ADC_vect)  {
 		}	
 		IR_distance_mean = calc_buffer_mean(IR_buffer, IR_BUFFER_SIZE);
 	} else {
-		IR_distance_mean = 0;
+		IR_distance_mean = 1000;
 	}
 	
 	I2C_pack_one(SENSOR_OBSTACLE_DISTANCE, IR_distance_mean);
