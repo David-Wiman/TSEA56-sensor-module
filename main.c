@@ -69,7 +69,7 @@ void init_interrupts_INT0_1() {
 }
 
 void init_ADC() {
-	ADMUX = (1<<REFS1) | (1<<REFS0);  // Set referense-voltage to internal 2.56V.
+	ADMUX = (1<<REFS1) | (1<<REFS0);  // Set reference-voltage to internal 2.56V.
 	ADCSRA = (1<<ADEN) | (1<<ADIE);	//Enable ADC and ADC Interrupt
 }
 
@@ -129,13 +129,15 @@ ISR (ADC_vect)  {
 	
 // Left hall sensor
 ISR (INT0_vect) {
-	times_without_hall = 0;
 	left_hall_time = time_var - pre_left_time_var;
-	pre_left_time_var = time_var;
 	
-	if (left_hall_time == 0) {
+	if (left_hall_time < 50) {  // Corresponds to 2000 mm/s (The car will, in practice, not go that fast)
 		return;
 	}
+	
+	pre_left_time_var = time_var;
+	times_without_hall = 0;
+	
 
 	left_speed = 98175/left_hall_time; // 1000*0.0080*pi*1000/0.256 = 98175
 
@@ -164,13 +166,16 @@ ISR (INT0_vect) {
 
 // Right hall sensor
 ISR (INT1_vect) {
-	times_without_hall = 0;
 	right_hall_time = time_var - pre_right_time_var;
-	pre_right_time_var = time_var;
 	
-	if (right_hall_time == 0) {
+	if (right_hall_time < 50) {  // Corresponds to 2000 mm/s (The car will, in practice, not go that fast)
 		return;
 	}
+	
+	pre_right_time_var = time_var;
+	times_without_hall = 0;
+	
+	
 	right_speed = 98175/right_hall_time; // 1000*0.0080*pi*1000/0.256 = 98175
 
 	 // Averaging code for right_speed
